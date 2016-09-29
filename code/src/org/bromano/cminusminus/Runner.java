@@ -2,6 +2,8 @@ package org.bromano.cminusminus;
 
 import org.bromano.cminusminus.lexer.CMinusMinusLexer;
 import org.bromano.cminusminus.lexer.Lexeme;
+import org.bromano.cminusminus.nodes.Program;
+import org.bromano.cminusminus.parser.CMinusMinusParser;
 
 import java.io.*;
 import java.util.List;
@@ -49,6 +51,8 @@ public class Runner {
 
     public static void run(String code) throws Exception {
         List<Lexeme> lexemes = new CMinusMinusLexer(code).getLexStream();
-        lexemes.stream().forEach(System.out::println);
+        lexemes.forEach(System.out::println);
+        Program program = new CMinusMinusParser(lexemes).parse();
+        System.out.println("Parsed code Successfully!");
     }
 }

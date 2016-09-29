@@ -1,7 +1,6 @@
 package org.bromano.cminusminus.emitter;
 
 import org.bromano.cminusminus.nodes.Program;
-import org.bromano.cminusminus.nodes.statements.Statement;
 
 public class CMinusMinusEmitter implements Emitter {
 
@@ -11,11 +10,11 @@ public class CMinusMinusEmitter implements Emitter {
     public String emit(Program program) throws EmitterException {
 
         this.prettyPrinter = new PrettyPrinter();
-
-        for (Statement s : program.statements) {
+//
+//        for (Statement s : program.statements) {
 //            this.emitStatement(s);
-        }
-
+//        }
+//
         return prettyPrinter.toString();
     }
 
@@ -202,7 +201,7 @@ public class CMinusMinusEmitter implements Emitter {
 //        this.emitExpression(expression.right);
 //    }
 //
-//    private void emitBooleanLiteralExpression(Primary expression) {
+//    private void emitBooleanLiteralExpression(NumberExpression expression) {
 //
 //        this.prettyPrinter.append(expression.bool.value);
 //    }
@@ -347,9 +346,9 @@ public class CMinusMinusEmitter implements Emitter {
 //        } else if (expression instanceof BinaryExpression) {
 //            this.emitBinaryExpression((BinaryExpression) expression);
 //
-//        } else if (expression instanceof Primary) {
+//        } else if (expression instanceof NumberExpression) {
 //
-//            this.emitBooleanLiteralExpression((Primary) expression);
+//            this.emitBooleanLiteralExpression((NumberExpression) expression);
 //
 //        } else if (expression instanceof CallExpression) {
 //

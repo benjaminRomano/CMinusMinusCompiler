@@ -14,6 +14,7 @@ public interface Parser {
     Expression parseExpression(int precedence) throws ParserException;
     Statement parseStatement() throws ParserException;
     Lexeme match(LexemeKind kind) throws ParserException;
+    Lexeme match(LexemeKind[] kinds) throws ParserException;
     Lexeme match() throws ParserException;
     boolean isAMatch(LexemeKind kind);
     boolean isAMatch(LexemeKind[] kinds);
