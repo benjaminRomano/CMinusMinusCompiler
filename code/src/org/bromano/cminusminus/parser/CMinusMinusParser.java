@@ -5,6 +5,7 @@ import org.bromano.cminusminus.lexer.TokenKind;
 import org.bromano.cminusminus.nodes.Program;
 import org.bromano.cminusminus.nodes.declarations.*;
 import org.bromano.cminusminus.nodes.expressions.Expression;
+import org.bromano.cminusminus.nodes.expressions.LocationExpression;
 import org.bromano.cminusminus.nodes.statements.*;
 import org.bromano.cminusminus.parser.parslets.*;
 
@@ -129,6 +130,10 @@ public class CMinusMinusParser implements Parser {
         while (declarationPending()) {
             program.declarations.add(parseDeclaration());
 
+        }
+
+        if (pos < tokens.size()) {
+            throw new ParserException("Unexpected token: " + tokens.get(pos));
         }
 
         return program;
@@ -371,8 +376,8 @@ public class CMinusMinusParser implements Parser {
         return assignmentStatement;
     }
 
-    private Location parseLocation() throws ParserException {
-        Location location = new Location();
+    private LocationExpression parseLocation() throws ParserException {
+        LocationExpression location = new LocationExpression();
         location.name = this.match(TokenKind.Identifier);
 
         if (this.isAMatch(TokenKind.OpenBracket)) {

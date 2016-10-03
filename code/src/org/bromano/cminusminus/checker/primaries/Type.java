@@ -12,11 +12,9 @@ public enum Type {
 
 
     public static Type fromKind(TokenKind kind) throws CheckerException {
-        if (kind == TokenKind.Number) {
+        if (kind == TokenKind.IntKeyword) {
             return Number;
-        } else if (kind == TokenKind.TrueKeyword) {
-            return Boolean;
-        } else if (kind == TokenKind.FalseKeyword) {
+        } else if (kind == TokenKind.BoolKeyword) {
             return Boolean;
         }
 

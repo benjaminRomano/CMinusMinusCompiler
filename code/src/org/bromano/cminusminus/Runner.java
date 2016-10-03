@@ -1,5 +1,6 @@
 package org.bromano.cminusminus;
 
+import org.bromano.cminusminus.checker.Checker;
 import org.bromano.cminusminus.lexer.CMinusMinusLexer;
 import org.bromano.cminusminus.lexer.Token;
 import org.bromano.cminusminus.nodes.Program;
@@ -53,6 +54,7 @@ public class Runner {
         List<Token> tokens = new CMinusMinusLexer(code).getLexStream();
         tokens.forEach(System.out::println);
         Program program = new CMinusMinusParser(tokens).parse();
-        System.out.println("Parsed code Successfully!");
+        new Checker().check(program);
+        System.out.println("Parsed and checked code Successfully!");
     }
 }

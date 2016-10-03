@@ -18,6 +18,8 @@ public class CheckerContext {
         ParameterPrimary scanFunctionParameter = new ParameterPrimary(new Primary(Type.Number), true);
         scanFunction.parameters.add(scanFunctionParameter);
 
+        environment.addVariable("scan", scanFunction);
+
         FunctionPrimary printFunction = new FunctionPrimary();
         ParameterPrimary printFunctionParameter = new ParameterPrimary(new Primary(Type.Number), false);
         printFunction.parameters.add(printFunctionParameter);

@@ -3,14 +3,19 @@ package org.bromano.cminusminus.checker;
 import org.bromano.cminusminus.checker.primaries.Primary;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public class Environment {
     public Environment parent;
-    public HashMap<String, Primary> variables;
+    Map<String, Primary> variables;
+
+    public Environment() {
+        this.variables = new HashMap<>();
+    }
 
     public void addVariable(String name, Primary primary) throws CheckerException {
         if (this.variables.containsKey(name)) {
-            throw new CheckerException(String.format("%s already exists in scope", name));
+            throw new CheckerException(String.format("`%s` already exists in scope", name));
         }
 
         this.variables.put(name, primary);

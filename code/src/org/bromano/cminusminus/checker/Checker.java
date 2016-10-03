@@ -16,7 +16,21 @@ public class Checker {
             checkDeclaration(context, declaration);
         }
 
-        // TODO: Verify main exists with no parameters
+        if (!context.environment.hasVariable("main")) {
+            throw new CheckerException("Program must contain a main function");
+        }
+
+        Primary primary = context.environment.getVariable("main");
+
+        if (!(primary instanceof FunctionPrimary)) {
+            throw new CheckerException("main must be a function");
+        }
+
+        FunctionPrimary mainFunction = (FunctionPrimary) primary;
+
+        if (mainFunction.parameters.size() != 0) {
+            throw new CheckerException("main must be have 0 parameters");
+        }
     }
 
     private void checkDeclaration(CheckerContext context, Declaration declaration) throws CheckerException {
@@ -111,11 +125,16 @@ public class Checker {
 
         FunctionPrimary functionPrimary = (FunctionPrimary) primary;
 
+        if (functionPrimary.parameters.size() != functionCallStatement.arguments.size()) {
+            throw new CheckerException(String.format("Argument mismatch. Expected %d arguments, received %d", functionPrimary.parameters.size(), functionCallStatement.arguments.size()), functionCallStatement.name.linePos);
+
+        }
+
         for (int i = 0; i < functionCallStatement.arguments.size(); i++) {
             primary = checkExpression(context, functionCallStatement.arguments.get(i));
 
-            if (functionPrimary.parameters.get(i).isAddr && !(functionCallStatement.arguments.get(i) instanceof  LocationExpression)) {
-                throw new CheckerException("Expected location for pass-by-reference parameter",  functionCallStatement.name.linePos);
+            if (functionPrimary.parameters.get(i).isAddr && !(functionCallStatement.arguments.get(i) instanceof LocationExpression)) {
+                throw new CheckerException("Expected locationExpression for pass-by-reference parameter",  functionCallStatement.name.linePos);
             }
 
             if (primary.getType() != functionPrimary.parameters.get(i).getType()) {
