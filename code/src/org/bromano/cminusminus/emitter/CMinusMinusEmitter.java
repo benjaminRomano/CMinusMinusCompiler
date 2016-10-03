@@ -288,7 +288,7 @@ public class CMinusMinusEmitter implements Emitter {
 //
 //        int i = 0;
 //
-//        for (Map.Entry<Lexeme, Expression> keyValue : expression.keyValues.entrySet()) {
+//        for (Map.Entry<Token, Expression> keyValue : expression.keyValues.entrySet()) {
 //            i++;
 //
 //            this.prettyPrinter.append(keyValue.getKey().value);
@@ -391,11 +391,11 @@ public class CMinusMinusEmitter implements Emitter {
 //        }
 //    }
 //
-//    private void emitBinaryOperator(Lexeme lexeme) {
+//    private void emitBinaryOperator(Token lexeme) {
 //        this.prettyPrinter.append(" " + lexeme.value.trim() + " ");
 //    }
 //
-//    private void emitParamList(List<Lexeme> lexemes) {
+//    private void emitParamList(List<Token> lexemes) {
 //
 //        this.prettyPrinter.append("(");
 //

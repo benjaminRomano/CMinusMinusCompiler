@@ -1,27 +1,27 @@
 package org.bromano.cminusminus.lexer;
 
-public class Lexeme {
-    public LexemeKind kind;
+public class Token {
+    public TokenKind kind;
     public String value;
     public LinePosition linePos;
 
 
-    public Lexeme(LexemeKind kind) {
+    public Token(TokenKind kind) {
         this.kind = kind;
     }
 
-    public Lexeme(LexemeKind kind, String value) {
+    public Token(TokenKind kind, String value) {
        this.kind = kind;
         this.value = value;
     }
 
-    public Lexeme(LexemeKind kind, LinePosition linePos) {
+    public Token(TokenKind kind, LinePosition linePos) {
         this.kind = kind;
 
         this.linePos = linePos;
     }
 
-    public Lexeme(LexemeKind kind, String value, LinePosition linePos) {
+    public Token(TokenKind kind, String value, LinePosition linePos) {
         this.kind = kind;
         this.value = value;
         this.linePos = linePos;
@@ -41,9 +41,9 @@ public class Lexeme {
             return false;
         }
 
-        Lexeme lexeme = (Lexeme) obj;
-        return (lexeme.kind == this.kind
-                &&  (lexeme.value == null && this.value == null
-                || (lexeme.value != null && this.value != null && lexeme.value.equals(this.value))));
+        Token token = (Token) obj;
+        return (token.kind == this.kind
+                &&  (token.value == null && this.value == null
+                || (token.value != null && this.value != null && token.value.equals(this.value))));
     }
 }

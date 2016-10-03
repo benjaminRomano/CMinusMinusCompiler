@@ -1,10 +1,9 @@
 package org.bromano.cminusminus.nodes.statements;
 
-import org.bromano.cminusminus.lexer.Lexeme;
-import org.bromano.cminusminus.nodes.declarations.Location;
 import org.bromano.cminusminus.nodes.expressions.Expression;
+import org.bromano.cminusminus.nodes.expressions.LocationExpression;
 
 public class AssignmentStatement implements Statement {
-    public Location location;
+    public LocationExpression locationExpression;
     public Expression expression;
 }

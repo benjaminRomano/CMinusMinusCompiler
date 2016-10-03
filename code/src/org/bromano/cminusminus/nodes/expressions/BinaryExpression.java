@@ -1,10 +1,10 @@
 package org.bromano.cminusminus.nodes.expressions;
 
-import org.bromano.cminusminus.lexer.Lexeme;
+import org.bromano.cminusminus.lexer.Token;
 
 public class BinaryExpression implements Expression {
     public Expression left;
-    public Lexeme operator;
+    public Token operator;
     public Expression right;
 
 }

@@ -1,8 +1,8 @@
 package org.bromano.cminusminus.nodes.expressions;
 
-import org.bromano.cminusminus.lexer.Lexeme;
+import org.bromano.cminusminus.lexer.Token;
 
 public class UnaryExpression implements Expression {
-    public Lexeme operator;
+    public Token operator;
     public Expression expression;
 }

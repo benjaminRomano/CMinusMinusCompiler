@@ -1,7 +1,7 @@
 package org.bromano.cminusminus.parser;
 
-import org.bromano.cminusminus.lexer.Lexeme;
-import org.bromano.cminusminus.lexer.LexemeKind;
+import org.bromano.cminusminus.lexer.Token;
+import org.bromano.cminusminus.lexer.TokenKind;
 import org.bromano.cminusminus.nodes.Program;
 import org.bromano.cminusminus.nodes.declarations.*;
 import org.bromano.cminusminus.nodes.expressions.Expression;
@@ -11,17 +11,17 @@ import org.bromano.cminusminus.parser.parslets.*;
 import java.util.*;
 
 public class CMinusMinusParser implements Parser {
-    private List<Lexeme> lexemes;
+    private List<Token> tokens;
     private int pos;
     private int end;
 
     //Handles prefix and primaries
-    private Map<LexemeKind, PrefixParslet> prefixParslets;
+    private Map<TokenKind, PrefixParslet> prefixParslets;
     //Handles prefix and postfix
-    private Map<LexemeKind, InfixParslet> infixParslets;
+    private Map<TokenKind, InfixParslet> infixParslets;
 
-    public CMinusMinusParser(List<Lexeme> lexemes) {
-        this.setLexemeStream(lexemes);
+    public CMinusMinusParser(List<Token> tokens) {
+        this.setLexemeStream(tokens);
 
         this.prefixParslets = this.generatePrefixParsletMap();
         this.infixParslets = this.generateInfixParsletMap();
@@ -33,33 +33,33 @@ public class CMinusMinusParser implements Parser {
     }
 
     @Override
-    public void setLexemeStream(List<Lexeme> lexemes) {
-        this.lexemes = lexemes;
+    public void setLexemeStream(List<Token> tokens) {
+        this.tokens = tokens;
         this.pos = 0;
-        this.end = lexemes.size();
+        this.end = tokens.size();
     }
 
-    public Lexeme lookAhead(int x) {
+    public Token lookAhead(int x) {
         if (this.pos + x >= this.end) {
             return null;
         }
 
-        return this.lexemes.get(this.pos + x);
+        return this.tokens.get(this.pos + x);
     }
 
-    public boolean isAMatch(LexemeKind kind) {
-        return this.pos < this.end && this.lexemes.get(this.pos).kind == kind;
+    public boolean isAMatch(TokenKind kind) {
+        return this.pos < this.end && this.tokens.get(this.pos).kind == kind;
 
     }
 
-    public boolean isAMatch(LexemeKind[] kinds) {
+    public boolean isAMatch(TokenKind[] kinds) {
         if (this.pos >= this.end) {
             return false;
         }
 
-        Lexeme l = this.lexemes.get(this.pos);
+        Token l = this.tokens.get(this.pos);
 
-        for (LexemeKind kind : kinds) {
+        for (TokenKind kind : kinds) {
             if (l.kind == kind) {
                 return true;
             }
@@ -67,57 +67,57 @@ public class CMinusMinusParser implements Parser {
         return false;
     }
 
-    public boolean isAMatch(Lexeme lexeme, LexemeKind kind) {
-        return this.pos < this.end && lexeme.kind == kind;
+    public boolean isAMatch(Token token, TokenKind kind) {
+        return this.pos < this.end && token.kind == kind;
     }
 
-    public Lexeme match() throws ParserException {
+    public Token match() throws ParserException {
         if (this.pos >= this.end) {
-            throw new ParserException("Expected another lexeme");
+            throw new ParserException("Expected another token");
         }
 
-        Lexeme lexeme = this.lexemes.get(this.pos);
+        Token token = this.tokens.get(this.pos);
 
         this.pos++;
 
-        return lexeme;
+        return token;
     }
 
-    public Lexeme match(LexemeKind kind) throws ParserException {
+    public Token match(TokenKind kind) throws ParserException {
         if (this.pos >= this.end) {
             throw new ParserException("Expected a " + kind.name() + ", but received a EOF");
         }
 
-        Lexeme lexeme = this.lexemes.get(this.pos);
+        Token token = this.tokens.get(this.pos);
 
-        if (this.lexemes.get(this.pos).kind != kind) {
-            throw new ParserException("Expected a " + kind.name() + ", but received a " + lexeme.kind.name() + " at " + lexeme.linePos);
+        if (this.tokens.get(this.pos).kind != kind) {
+            throw new ParserException("Expected a " + kind.name() + ", but received a " + token.kind.name() + " at " + token.linePos);
         }
 
         this.pos++;
 
-        return lexeme;
+        return token;
     }
 
-    public Lexeme match(LexemeKind[] kinds) throws ParserException {
+    public Token match(TokenKind[] kinds) throws ParserException {
 
-        String kindString = Arrays.stream(kinds).map(LexemeKind::name).reduce("[", (a, v) -> a + " " + v) + "]";
+        String kindString = Arrays.stream(kinds).map(TokenKind::name).reduce("[", (a, v) -> a + " " + v) + "]";
 
         if (this.pos >= this.end) {
             throw new ParserException("Expected a " + kindString + ", but received a EOF");
         }
 
-        Lexeme lexeme = this.lexemes.get(this.pos);
+        Token token = this.tokens.get(this.pos);
 
-        boolean containsKind = Arrays.stream(kinds).anyMatch(x -> x == this.lexemes.get(this.pos).kind);
+        boolean containsKind = Arrays.stream(kinds).anyMatch(x -> x == this.tokens.get(this.pos).kind);
 
         if (!containsKind) {
-            throw new ParserException("Expected a " + kindString + ", but received a " + lexeme.kind.name() + " at " + lexeme.linePos);
+            throw new ParserException("Expected a " + kindString + ", but received a " + token.kind.name() + " at " + token.linePos);
         }
 
         this.pos++;
 
-        return lexeme;
+        return token;
     }
 
     @Override
@@ -145,12 +145,12 @@ public class CMinusMinusParser implements Parser {
     private FunctionDeclaration parseFunctionDeclaration() throws ParserException {
         FunctionDeclaration functionDeclaration = new FunctionDeclaration();
 
-        this.match(LexemeKind.VoidKeyword);
-        functionDeclaration.name = this.match(LexemeKind.Identifier);
+        this.match(TokenKind.VoidKeyword);
+        functionDeclaration.name = this.match(TokenKind.Identifier);
 
-        this.match(LexemeKind.OpenParen);
+        this.match(TokenKind.OpenParen);
         functionDeclaration.parameters = parseParameterList();
-        this.match(LexemeKind.CloseParen);
+        this.match(TokenKind.CloseParen);
 
         functionDeclaration.blockStatement = parseBlockStatement();
 
@@ -163,7 +163,7 @@ public class CMinusMinusParser implements Parser {
         if (parameterPending()) {
             parameters.add(parseParameter());
 
-            while (this.isAMatch(LexemeKind.Comma)) {
+            while (this.isAMatch(TokenKind.Comma)) {
                 this.match();
                 parameters.add(parseParameter());
             }
@@ -176,17 +176,17 @@ public class CMinusMinusParser implements Parser {
         Parameter parameter = new Parameter();
         parameter.type = parseType();
 
-        if (this.isAMatch(LexemeKind.Ampersand)) {
+        if (this.isAMatch(TokenKind.Ampersand)) {
             this.match();
             parameter.isAddr = true;
-            parameter.name = this.match(LexemeKind.Identifier);
+            parameter.name = this.match(TokenKind.Identifier);
         } else {
-            parameter.name = this.match(LexemeKind.Identifier);
+            parameter.name = this.match(TokenKind.Identifier);
 
-            if (this.isAMatch(LexemeKind.OpenBracket)) {
-                this.match(LexemeKind.OpenBracket);
-                parameter.number = this.match(LexemeKind.Number);
-                this.match(LexemeKind.CloseBracket);
+            if (this.isAMatch(TokenKind.OpenBracket)) {
+                this.match(TokenKind.OpenBracket);
+                parameter.number = this.match(TokenKind.Number);
+                this.match(TokenKind.CloseBracket);
             }
         }
 
@@ -200,35 +200,35 @@ public class CMinusMinusParser implements Parser {
 
         variableDeclaration.variables.add(this.parseVariable());
 
-        while (this.isAMatch(LexemeKind.Comma)) {
-            this.match(LexemeKind.Comma);
+        while (this.isAMatch(TokenKind.Comma)) {
+            this.match(TokenKind.Comma);
             variableDeclaration.variables.add(this.parseVariable());
         }
 
-        this.match(LexemeKind.Semicolon);
+        this.match(TokenKind.Semicolon);
 
         return variableDeclaration;
     }
 
     private Variable parseVariable() throws ParserException {
         Variable variable = new Variable();
-        variable.name = this.match(LexemeKind.Identifier);
+        variable.name = this.match(TokenKind.Identifier);
 
-        if (this.isAMatch(LexemeKind.OpenBracket)) {
-            this.match(LexemeKind.OpenBracket);
-            variable.number = this.match(LexemeKind.Number);
-            this.match(LexemeKind.CloseBracket);
+        if (this.isAMatch(TokenKind.OpenBracket)) {
+            this.match(TokenKind.OpenBracket);
+            variable.number = this.match(TokenKind.Number);
+            this.match(TokenKind.CloseBracket);
         }
 
         return variable;
     }
 
-    private Lexeme parseType() throws ParserException {
-        return this.match(new LexemeKind[]{LexemeKind.BoolKeyword, LexemeKind.IntKeyword});
+    private Token parseType() throws ParserException {
+        return this.match(new TokenKind[]{TokenKind.BoolKeyword, TokenKind.IntKeyword});
     }
 
     private BlockStatement parseBlockStatement() throws ParserException {
-        this.match(LexemeKind.OpenBrace);
+        this.match(TokenKind.OpenBrace);
 
         BlockStatement blockStatement = new BlockStatement();
 
@@ -240,7 +240,7 @@ public class CMinusMinusParser implements Parser {
             blockStatement.statements.add(parseStatement());
         }
 
-        this.match(LexemeKind.CloseBrace);
+        this.match(TokenKind.CloseBrace);
 
         return blockStatement;
     }
@@ -262,23 +262,23 @@ public class CMinusMinusParser implements Parser {
     }
 
     public Expression parseExpression(int precedence) throws ParserException {
-        Lexeme lexeme = this.match();
+        Token token = this.match();
 
-        PrefixParslet prefix = this.prefixParslets.getOrDefault(lexeme.kind, null);
+        PrefixParslet prefix = this.prefixParslets.getOrDefault(token.kind, null);
 
         if (prefix == null) {
-            throw new ParserException("Unexpected token: " + lexeme + " at line " + lexeme.linePos);
+            throw new ParserException("Unexpected token: " + token + " at line " + token.linePos);
         }
 
-        Expression left = prefix.parse(this, lexeme);
+        Expression left = prefix.parse(this, token);
 
         while (precedence < this.getPrecedence()) {
 
-            lexeme = this.match();
+            token = this.match();
 
-            InfixParslet infix = this.infixParslets.get(lexeme.kind);
+            InfixParslet infix = this.infixParslets.get(token.kind);
 
-            left = infix.parse(this, left, lexeme);
+            left = infix.parse(this, left, token);
         }
 
         return left;
@@ -302,7 +302,7 @@ public class CMinusMinusParser implements Parser {
 
             return this.parseDoStatement();
 
-        } else if (this.functionCallStatementPending() && this.isAMatch(this.lookAhead(1), LexemeKind.OpenParen)) {
+        } else if (this.functionCallStatementPending() && this.isAMatch(this.lookAhead(1), TokenKind.OpenParen)) {
 
             return this.parseFunctionCallStatement();
 
@@ -318,14 +318,14 @@ public class CMinusMinusParser implements Parser {
     private IfStatement parseIfStatement() throws ParserException {
         IfStatement ifStatement = new IfStatement();
 
-        this.match(LexemeKind.IfKeyword);
-        this.match(LexemeKind.OpenParen);
+        this.match(TokenKind.IfKeyword);
+        this.match(TokenKind.OpenParen);
         ifStatement.conditional = parseExpression();
-        this.match(LexemeKind.CloseParen);
+        this.match(TokenKind.CloseParen);
 
         ifStatement.statement = parseStatement();
 
-        if (this.isAMatch(LexemeKind.ElseKeyword)) {
+        if (this.isAMatch(TokenKind.ElseKeyword)) {
             this.match();
             ifStatement.elseStatement = parseStatement();
         }
@@ -336,10 +336,10 @@ public class CMinusMinusParser implements Parser {
     private WhileStatement parseWhileStatement() throws ParserException {
         WhileStatement whileStatement = new WhileStatement();
 
-        this.match(LexemeKind.WhileKeyword);
-        this.match(LexemeKind.OpenParen);
+        this.match(TokenKind.WhileKeyword);
+        this.match(TokenKind.OpenParen);
         whileStatement.conditional = parseExpression();
-        this.match(LexemeKind.CloseParen);
+        this.match(TokenKind.CloseParen);
         whileStatement.statement = parseStatement();
 
         return whileStatement;
@@ -348,13 +348,13 @@ public class CMinusMinusParser implements Parser {
     private DoStatement parseDoStatement() throws ParserException {
         DoStatement doStatement = new DoStatement();
 
-        this.match(LexemeKind.DoKeyword);
+        this.match(TokenKind.DoKeyword);
         doStatement.statement = parseStatement();
-        this.match(LexemeKind.WhileKeyword);
-        this.match(LexemeKind.OpenParen);
+        this.match(TokenKind.WhileKeyword);
+        this.match(TokenKind.OpenParen);
         doStatement.conditional = parseExpression();
-        this.match(LexemeKind.CloseParen);
-        this.match(LexemeKind.Semicolon);
+        this.match(TokenKind.CloseParen);
+        this.match(TokenKind.Semicolon);
 
         return doStatement;
     }
@@ -362,23 +362,23 @@ public class CMinusMinusParser implements Parser {
     private AssignmentStatement parseAssignmentStatement() throws ParserException {
         AssignmentStatement assignmentStatement = new AssignmentStatement();
 
-        assignmentStatement.location = parseLocation();
+        assignmentStatement.locationExpression = parseLocation();
 
-        this.match(LexemeKind.Equals);
+        this.match(TokenKind.Equals);
         assignmentStatement.expression = parseExpression();
-        this.match(LexemeKind.Semicolon);
+        this.match(TokenKind.Semicolon);
 
         return assignmentStatement;
     }
 
     private Location parseLocation() throws ParserException {
         Location location = new Location();
-        location.name = this.match(LexemeKind.Identifier);
+        location.name = this.match(TokenKind.Identifier);
 
-        if (this.isAMatch(LexemeKind.OpenBracket)) {
+        if (this.isAMatch(TokenKind.OpenBracket)) {
             this.match();
             location.expression = parseExpression();
-            this.match(LexemeKind.CloseBracket);
+            this.match(TokenKind.CloseBracket);
         }
 
         return location;
@@ -386,20 +386,20 @@ public class CMinusMinusParser implements Parser {
 
     private FunctionCallStatement parseFunctionCallStatement() throws ParserException {
         FunctionCallStatement functionCallStatement = new FunctionCallStatement();
-        functionCallStatement.name = this.match(LexemeKind.Identifier);
-        this.match(LexemeKind.OpenParen);
+        functionCallStatement.name = this.match(TokenKind.Identifier);
+        this.match(TokenKind.OpenParen);
 
         if (this.expressionPending()) {
             functionCallStatement.arguments.add(parseExpression());
 
-            while (this.isAMatch(LexemeKind.Comma)) {
+            while (this.isAMatch(TokenKind.Comma)) {
                 this.match();
                 functionCallStatement.arguments.add(parseExpression());
             }
         }
 
-        this.match(LexemeKind.CloseParen);
-        this.match(LexemeKind.Semicolon);
+        this.match(TokenKind.CloseParen);
+        this.match(TokenKind.Semicolon);
 
         return functionCallStatement;
     }
@@ -409,15 +409,15 @@ public class CMinusMinusParser implements Parser {
     }
 
     private boolean variableDeclarationPending() {
-        return this.isAMatch(new LexemeKind[]{LexemeKind.IntKeyword, LexemeKind.BoolKeyword});
+        return this.isAMatch(new TokenKind[]{TokenKind.IntKeyword, TokenKind.BoolKeyword});
     }
 
     private boolean functionDeclarationPending() {
-        return this.isAMatch(LexemeKind.VoidKeyword);
+        return this.isAMatch(TokenKind.VoidKeyword);
     }
 
     private boolean typePending() throws ParserException {
-        return this.isAMatch(new LexemeKind[]{LexemeKind.BoolKeyword, LexemeKind.IntKeyword});
+        return this.isAMatch(new TokenKind[]{TokenKind.BoolKeyword, TokenKind.IntKeyword});
     }
 
     private boolean parameterPending() throws ParserException {
@@ -434,23 +434,23 @@ public class CMinusMinusParser implements Parser {
     }
 
     private boolean blockStatementPending() {
-        return this.isAMatch(LexemeKind.OpenBrace);
+        return this.isAMatch(TokenKind.OpenBrace);
     }
 
     private boolean ifStatementPending() {
-        return this.isAMatch(LexemeKind.IfKeyword);
+        return this.isAMatch(TokenKind.IfKeyword);
     }
 
     private boolean doStatementPending() {
-        return this.isAMatch(LexemeKind.DoKeyword);
+        return this.isAMatch(TokenKind.DoKeyword);
     }
 
     private boolean whileStatementPending() {
-        return this.isAMatch(LexemeKind.WhileKeyword);
+        return this.isAMatch(TokenKind.WhileKeyword);
     }
 
     private boolean functionCallStatementPending() {
-        return this.isAMatch(LexemeKind.Identifier);
+        return this.isAMatch(TokenKind.Identifier);
     }
 
     private boolean assignmentStatementPending() {
@@ -458,60 +458,60 @@ public class CMinusMinusParser implements Parser {
     }
 
     private boolean locationPending() {
-        return this.isAMatch(LexemeKind.Identifier);
+        return this.isAMatch(TokenKind.Identifier);
     }
 
     private boolean expressionPending() {
         return this.locationPending() ||
-                this.isAMatch(new LexemeKind[]{
-                        LexemeKind.Number,
-                        LexemeKind.TrueKeyword,
-                        LexemeKind.FalseKeyword,
-                        LexemeKind.OpenParen,
-                        LexemeKind.Exclamation,
-                        LexemeKind.Minus,
-                        LexemeKind.Plus
+                this.isAMatch(new TokenKind[]{
+                        TokenKind.Number,
+                        TokenKind.TrueKeyword,
+                        TokenKind.FalseKeyword,
+                        TokenKind.OpenParen,
+                        TokenKind.Exclamation,
+                        TokenKind.Minus,
+                        TokenKind.Plus
                 });
     }
 
-    private Map<LexemeKind, PrefixParslet> generatePrefixParsletMap() {
-        Map<LexemeKind, PrefixParslet> map = new HashMap<>();
+    private Map<TokenKind, PrefixParslet> generatePrefixParsletMap() {
+        Map<TokenKind, PrefixParslet> map = new HashMap<>();
 
-        map.put(LexemeKind.Exclamation, new PrefixOperatorParslet(Precedence.PREFIX));
-        map.put(LexemeKind.Minus, new PrefixOperatorParslet(Precedence.PREFIX));
-        map.put(LexemeKind.Plus, new PrefixOperatorParslet(Precedence.PREFIX));
+        map.put(TokenKind.Exclamation, new PrefixOperatorParslet(Precedence.PREFIX));
+        map.put(TokenKind.Minus, new PrefixOperatorParslet(Precedence.PREFIX));
+        map.put(TokenKind.Plus, new PrefixOperatorParslet(Precedence.PREFIX));
 
-        map.put(LexemeKind.Identifier, new LocationParslet());
-        map.put(LexemeKind.Number, new NumberParslet());
+        map.put(TokenKind.Identifier, new LocationParslet());
+        map.put(TokenKind.Number, new NumberParslet());
 
-        map.put(LexemeKind.TrueKeyword, new BooleanParslet());
-        map.put(LexemeKind.FalseKeyword, new BooleanParslet());
+        map.put(TokenKind.TrueKeyword, new BooleanParslet());
+        map.put(TokenKind.FalseKeyword, new BooleanParslet());
 
-        map.put(LexemeKind.OpenParen, new GroupParslet());
+        map.put(TokenKind.OpenParen, new GroupParslet());
 
         return map;
     }
 
-    private Map<LexemeKind, InfixParslet> generateInfixParsletMap() {
-        Map<LexemeKind, InfixParslet> map = new HashMap<>();
+    private Map<TokenKind, InfixParslet> generateInfixParsletMap() {
+        Map<TokenKind, InfixParslet> map = new HashMap<>();
 
-        map.put(LexemeKind.BarBar, new BinaryOperatorParslet(Precedence.LOGICALOR, false));
-        map.put(LexemeKind.AmpersandAmpersand, new BinaryOperatorParslet(Precedence.LOGICALAND, false));
+        map.put(TokenKind.BarBar, new BinaryOperatorParslet(Precedence.LOGICALOR, false));
+        map.put(TokenKind.AmpersandAmpersand, new BinaryOperatorParslet(Precedence.LOGICALAND, false));
 
-        map.put(LexemeKind.EqualsEquals, new BinaryOperatorParslet(Precedence.EQUALITY, false));
-        map.put(LexemeKind.ExclamationEquals, new BinaryOperatorParslet(Precedence.EQUALITY, false));
+        map.put(TokenKind.EqualsEquals, new BinaryOperatorParslet(Precedence.EQUALITY, false));
+        map.put(TokenKind.ExclamationEquals, new BinaryOperatorParslet(Precedence.EQUALITY, false));
 
-        map.put(LexemeKind.LessThan, new BinaryOperatorParslet(Precedence.RELATIONAL, false));
-        map.put(LexemeKind.LessThanEquals, new BinaryOperatorParslet(Precedence.RELATIONAL, false));
-        map.put(LexemeKind.GreaterThan, new BinaryOperatorParslet(Precedence.RELATIONAL, false));
-        map.put(LexemeKind.GreaterThanEquals, new BinaryOperatorParslet(Precedence.RELATIONAL, false));
+        map.put(TokenKind.LessThan, new BinaryOperatorParslet(Precedence.RELATIONAL, false));
+        map.put(TokenKind.LessThanEquals, new BinaryOperatorParslet(Precedence.RELATIONAL, false));
+        map.put(TokenKind.GreaterThan, new BinaryOperatorParslet(Precedence.RELATIONAL, false));
+        map.put(TokenKind.GreaterThanEquals, new BinaryOperatorParslet(Precedence.RELATIONAL, false));
 
-        map.put(LexemeKind.Plus, new BinaryOperatorParslet(Precedence.ADDITIVE, false));
-        map.put(LexemeKind.Minus, new BinaryOperatorParslet(Precedence.ADDITIVE, false));
+        map.put(TokenKind.Plus, new BinaryOperatorParslet(Precedence.ADDITIVE, false));
+        map.put(TokenKind.Minus, new BinaryOperatorParslet(Precedence.ADDITIVE, false));
 
-        map.put(LexemeKind.Asterisk, new BinaryOperatorParslet(Precedence.MULTIPLICATIVE, false));
-        map.put(LexemeKind.Slash, new BinaryOperatorParslet(Precedence.MULTIPLICATIVE, false));
-        map.put(LexemeKind.Percent, new BinaryOperatorParslet(Precedence.MULTIPLICATIVE, false));
+        map.put(TokenKind.Asterisk, new BinaryOperatorParslet(Precedence.MULTIPLICATIVE, false));
+        map.put(TokenKind.Slash, new BinaryOperatorParslet(Precedence.MULTIPLICATIVE, false));
+        map.put(TokenKind.Percent, new BinaryOperatorParslet(Precedence.MULTIPLICATIVE, false));
 
         return map;
     }

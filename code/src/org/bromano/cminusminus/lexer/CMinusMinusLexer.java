@@ -12,7 +12,7 @@ public class CMinusMinusLexer implements Lexer {
     private int lineStart;
     private int pos;
     private int end;
-    private Map<String, LexemeKind> keywordMap;
+    private Map<String, TokenKind> keywordMap;
 
     public CMinusMinusLexer() {
         this.keywordMap = this.generateKeywordMap();
@@ -33,7 +33,7 @@ public class CMinusMinusLexer implements Lexer {
     }
 
     @Override
-    public Lexeme lex() throws LexerException {
+    public Token lex() throws LexerException {
 
         while (true) {
             String value;
@@ -62,56 +62,56 @@ public class CMinusMinusLexer implements Lexer {
                     this.pos++;
                     if (isAMatch(this.pos, "=")) {
                         this.pos++;
-                        return new Lexeme(LexemeKind.ExclamationEquals, "!=", linePos);
+                        return new Token(TokenKind.ExclamationEquals, "!=", linePos);
                     }
 
-                    return new Lexeme(LexemeKind.Exclamation, "!", linePos);
+                    return new Token(TokenKind.Exclamation, "!", linePos);
                 case '%':
                     linePos = getLinePosition();
                     this.pos++;
 
-                    return new Lexeme(LexemeKind.Percent, "%", linePos);
+                    return new Token(TokenKind.Percent, "%", linePos);
                 case '&':
                     linePos = getLinePosition();
                     this.pos++;
 
                     if (isAMatch(this.pos, "&")) {
                         this.pos++;
-                        return new Lexeme(LexemeKind.AmpersandAmpersand, "&&", linePos);
+                        return new Token(TokenKind.AmpersandAmpersand, "&&", linePos);
                     }
 
-                    return new Lexeme(LexemeKind.Ampersand, "&", linePos);
+                    return new Token(TokenKind.Ampersand, "&", linePos);
                 case '(':
                     linePos = getLinePosition();
                     this.pos++;
-                    return new Lexeme(LexemeKind.OpenParen, linePos);
+                    return new Token(TokenKind.OpenParen, linePos);
                 case ')':
                     linePos = getLinePosition();
                     this.pos++;
-                    return new Lexeme(LexemeKind.CloseParen, linePos);
+                    return new Token(TokenKind.CloseParen, linePos);
                 case '*':
                     linePos = getLinePosition();
                     this.pos++;
 
-                    return new Lexeme(LexemeKind.Asterisk, "*", linePos);
+                    return new Token(TokenKind.Asterisk, "*", linePos);
                 case '+':
                     linePos = getLinePosition();
                     this.pos++;
 
-                    return new Lexeme(LexemeKind.Plus, "+", linePos);
+                    return new Token(TokenKind.Plus, "+", linePos);
                 case ',':
                     linePos = getLinePosition();
                     this.pos++;
-                    return new Lexeme(LexemeKind.Comma, ",", linePos);
+                    return new Token(TokenKind.Comma, ",", linePos);
                 case '-':
                     linePos = getLinePosition();
                     this.pos++;
 
-                    return new Lexeme(LexemeKind.Minus, "-", linePos);
+                    return new Token(TokenKind.Minus, "-", linePos);
                 case '.':
                     linePos = getLinePosition();
                     this.pos++;
-                    return new Lexeme(LexemeKind.Dot, ".", linePos);
+                    return new Token(TokenKind.Dot, ".", linePos);
                 case '/':
                     linePos = getLinePosition();
                     this.pos++;
@@ -138,64 +138,64 @@ public class CMinusMinusLexer implements Lexer {
                         continue;
                     }
 
-                    return new Lexeme(LexemeKind.Slash, "/", linePos);
+                    return new Token(TokenKind.Slash, "/", linePos);
                 case ';':
                     linePos = getLinePosition();
                     this.pos++;
-                    return new Lexeme(LexemeKind.Semicolon, ";", linePos);
+                    return new Token(TokenKind.Semicolon, ";", linePos);
                 case '<':
                     linePos = getLinePosition();
                     this.pos++;
 
                     if (isAMatch(this.pos, "=")) {
                         this.pos++;
-                        return new Lexeme(LexemeKind.LessThanEquals, "<=", linePos);
+                        return new Token(TokenKind.LessThanEquals, "<=", linePos);
                     }
 
-                    return new Lexeme(LexemeKind.LessThan, "<", linePos);
+                    return new Token(TokenKind.LessThan, "<", linePos);
                 case '=':
                     linePos = getLinePosition();
                     this.pos++;
 
                     if (isAMatch(this.pos, "=")) {
                         this.pos++;
-                        return new Lexeme(LexemeKind.EqualsEquals, "==", linePos);
+                        return new Token(TokenKind.EqualsEquals, "==", linePos);
                     } else if (this.isAMatch(this.pos, ">")) {
                         this.pos++;
-                        return new Lexeme(LexemeKind.EqualsGreaterThan, "=>", linePos);
+                        return new Token(TokenKind.EqualsGreaterThan, "=>", linePos);
                     }
 
-                    return new Lexeme(LexemeKind.Equals, "=", linePos);
+                    return new Token(TokenKind.Equals, "=", linePos);
                 case '>':
                     linePos = getLinePosition();
                     this.pos++;
 
                     if (isAMatch(this.pos, "=")) {
                         this.pos++;
-                        return new Lexeme(LexemeKind.GreaterThanEquals, ">=", linePos);
+                        return new Token(TokenKind.GreaterThanEquals, ">=", linePos);
                     }
 
-                    return new Lexeme(LexemeKind.GreaterThan, ">", linePos);
+                    return new Token(TokenKind.GreaterThan, ">", linePos);
                 case '[':
                     linePos = getLinePosition();
                     this.pos++;
-                    return new Lexeme(LexemeKind.OpenBracket, linePos);
+                    return new Token(TokenKind.OpenBracket, linePos);
                 case ']':
                     linePos = getLinePosition();
                     this.pos++;
-                    return new Lexeme(LexemeKind.CloseBracket, linePos);
+                    return new Token(TokenKind.CloseBracket, linePos);
                 case '_':
                     linePos = getLinePosition();
                     value = this.scanIdentifier();
-                    return new Lexeme(LexemeKind.Identifier, value, linePos);
+                    return new Token(TokenKind.Identifier, value, linePos);
                 case '{':
                     linePos = getLinePosition();
                     this.pos++;
-                    return new Lexeme(LexemeKind.OpenBrace, linePos);
+                    return new Token(TokenKind.OpenBrace, linePos);
                 case '}':
                     linePos = getLinePosition();
                     this.pos++;
-                    return new Lexeme(LexemeKind.CloseBrace, linePos);
+                    return new Token(TokenKind.CloseBrace, linePos);
                 case '|':
                     linePos = getLinePosition();
                     this.pos++;
@@ -205,7 +205,7 @@ public class CMinusMinusLexer implements Lexer {
                     }
 
                     this.pos++;
-                    return new Lexeme(LexemeKind.BarBar, "||", linePos);
+                    return new Token(TokenKind.BarBar, "||", linePos);
                 case '0':
                 case '1':
                 case '2':
@@ -218,7 +218,7 @@ public class CMinusMinusLexer implements Lexer {
                 case '9':
                     linePos = getLinePosition();
                     value = this.scanNumber();
-                    return new Lexeme(LexemeKind.Number, value, linePos);
+                    return new Token(TokenKind.Number, value, linePos);
                 default:
                     linePos = getLinePosition();
 
@@ -227,10 +227,10 @@ public class CMinusMinusLexer implements Lexer {
                         String identifierOrKeyword = this.scanIdentifier();
 
                         if (this.keywordMap.containsKey(identifierOrKeyword.trim())) {
-                            return new Lexeme(keywordMap.get(identifierOrKeyword.trim()), linePos);
+                            return new Token(keywordMap.get(identifierOrKeyword.trim()), linePos);
                         }
 
-                        return new Lexeme(LexemeKind.Identifier, identifierOrKeyword, linePos);
+                        return new Token(TokenKind.Identifier, identifierOrKeyword, linePos);
                     }
 
                     throw new LexerException(error("Char " + ch + " cannot be lexed"));
@@ -239,18 +239,18 @@ public class CMinusMinusLexer implements Lexer {
     }
 
     @Override
-    public List<Lexeme> getLexStream() throws LexerException {
-        List<Lexeme> lexemes = new ArrayList<>();
+    public List<Token> getLexStream() throws LexerException {
+        List<Token> tokens = new ArrayList<>();
 
-        Lexeme lexeme = this.lex();
+        Token token = this.lex();
 
-        while (lexeme != null) {
-            lexemes.add(lexeme);
+        while (token != null) {
+            tokens.add(token);
 
-            lexeme = this.lex();
+            token = this.lex();
         }
 
-        return lexemes;
+        return tokens;
     }
 
     private boolean isAlphabetOrUnderscore(char ch) {
@@ -316,17 +316,17 @@ public class CMinusMinusLexer implements Lexer {
         return getLinePosition().toString() + " " + s;
     }
 
-    private Map<String, LexemeKind> generateKeywordMap() {
-        Map<String, LexemeKind> keywordMap = new HashMap<>();
-        keywordMap.put("if", LexemeKind.IfKeyword);
-        keywordMap.put("else", LexemeKind.ElseKeyword);
-        keywordMap.put("while", LexemeKind.WhileKeyword);
-        keywordMap.put("true", LexemeKind.TrueKeyword);
-        keywordMap.put("false", LexemeKind.FalseKeyword);
-        keywordMap.put("bool", LexemeKind.BoolKeyword);
-        keywordMap.put("void", LexemeKind.VoidKeyword);
-        keywordMap.put("do", LexemeKind.DoKeyword);
-        keywordMap.put("int", LexemeKind.IntKeyword);
+    private Map<String, TokenKind> generateKeywordMap() {
+        Map<String, TokenKind> keywordMap = new HashMap<>();
+        keywordMap.put("if", TokenKind.IfKeyword);
+        keywordMap.put("else", TokenKind.ElseKeyword);
+        keywordMap.put("while", TokenKind.WhileKeyword);
+        keywordMap.put("true", TokenKind.TrueKeyword);
+        keywordMap.put("false", TokenKind.FalseKeyword);
+        keywordMap.put("bool", TokenKind.BoolKeyword);
+        keywordMap.put("void", TokenKind.VoidKeyword);
+        keywordMap.put("do", TokenKind.DoKeyword);
+        keywordMap.put("int", TokenKind.IntKeyword);
 
         return keywordMap;
     }

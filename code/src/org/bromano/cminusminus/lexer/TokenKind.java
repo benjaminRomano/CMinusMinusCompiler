@@ -1,6 +1,6 @@
 package org.bromano.cminusminus.lexer;
 
-public enum LexemeKind {
+public enum TokenKind {
     //Literals
     Identifier,
     Number,

@@ -1,6 +1,6 @@
 package org.bromano.cminusminus.parser.parslets;
 
-import org.bromano.cminusminus.lexer.Lexeme;
+import org.bromano.cminusminus.lexer.Token;
 import org.bromano.cminusminus.nodes.expressions.BinaryExpression;
 import org.bromano.cminusminus.nodes.expressions.Expression;
 import org.bromano.cminusminus.parser.Parser;
@@ -16,12 +16,12 @@ public class BinaryOperatorParslet implements InfixParslet {
         this.isRightAssociative = isRightAssociative;
     }
 
-    public Expression parse(Parser parser, Expression lhs, Lexeme lexeme) throws ParserException {
+    public Expression parse(Parser parser, Expression lhs, Token token) throws ParserException {
 
         BinaryExpression binaryExpression = new BinaryExpression();
 
         binaryExpression.left = lhs;
-        binaryExpression.operator = lexeme;
+        binaryExpression.operator = token;
 
         // Precedence climbing algorithm requires setting precedence -1 for right associative
         if (this.isRightAssociative)  {
