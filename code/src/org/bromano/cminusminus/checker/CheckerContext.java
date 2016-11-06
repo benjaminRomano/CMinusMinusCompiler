@@ -1,29 +1,34 @@
 package org.bromano.cminusminus.checker;
 
-import org.bromano.cminusminus.checker.primaries.FunctionPrimary;
-import org.bromano.cminusminus.checker.primaries.ParameterPrimary;
-import org.bromano.cminusminus.checker.primaries.Primary;
-import org.bromano.cminusminus.checker.primaries.Type;
+import org.bromano.cminusminus.symbols.Symbol;
+import org.bromano.cminusminus.symbols.SymbolTable;
+import org.bromano.cminusminus.types.FieldType;
+import org.bromano.cminusminus.types.FunctionType;
+import org.bromano.cminusminus.types.LiteralType;
+import org.bromano.cminusminus.types.TypeKind;
 
 public class CheckerContext {
-    Environment environment;
+    SymbolTable symbolTable;
 
     public CheckerContext() throws CheckerException {
-        initializeEnvironment();
+        initializeSymbolTable();
     }
 
-    private void initializeEnvironment() throws CheckerException {
-        environment = new Environment();
-        FunctionPrimary scanFunction = new FunctionPrimary();
-        ParameterPrimary scanFunctionParameter = new ParameterPrimary(new Primary(Type.Number), true);
+    private void initializeSymbolTable() throws CheckerException {
+        symbolTable = new SymbolTable();
+        FunctionType scanFunction = new FunctionType();
+        FieldType scanFunctionParameter = new FieldType("value", new LiteralType(TypeKind.Number), true);
         scanFunction.parameters.add(scanFunctionParameter);
+        Symbol scanSymbol = new Symbol(scanFunction);
 
-        environment.addVariable("scan", scanFunction);
+        symbolTable.addVariable("scan", scanSymbol);
 
-        FunctionPrimary printFunction = new FunctionPrimary();
-        ParameterPrimary printFunctionParameter = new ParameterPrimary(new Primary(Type.Number), false);
+        FunctionType printFunction = new FunctionType();
+        FieldType printFunctionParameter = new FieldType("value", new LiteralType(TypeKind.Number), false);
         printFunction.parameters.add(printFunctionParameter);
 
-        environment.addVariable("print", printFunction);
+        Symbol printSymbol = new Symbol(printFunction);
+
+        symbolTable.addVariable("print", printSymbol);
     }
 }

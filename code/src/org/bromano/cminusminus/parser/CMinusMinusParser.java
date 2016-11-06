@@ -190,8 +190,8 @@ public class CMinusMinusParser implements Parser {
 
             if (this.isAMatch(TokenKind.OpenBracket)) {
                 this.match(TokenKind.OpenBracket);
-                parameter.number = this.match(TokenKind.Number);
                 this.match(TokenKind.CloseBracket);
+                parameter.isArray = true;
             }
         }
 

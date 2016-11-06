@@ -1,17 +1,15 @@
-package org.bromano.cminusminus.checker.primaries;
+package org.bromano.cminusminus.types;
 
 import org.bromano.cminusminus.checker.CheckerException;
 import org.bromano.cminusminus.lexer.TokenKind;
 
-public enum Type {
+public enum TypeKind {
     Number,
     Boolean,
-    BooleanArray,
-    NumberArray,
+    Array,
     Function;
 
-
-    public static Type fromKind(TokenKind kind) throws CheckerException {
+    public static TypeKind fromTokenKind(TokenKind kind) throws CheckerException {
         if (kind == TokenKind.IntKeyword) {
             return Number;
         } else if (kind == TokenKind.BoolKeyword) {

@@ -1,0 +1,158 @@
+// Notes: Keep track of 
+
+
+Program => {
+    label = generateLabel();
+    size = 0;
+    for each variableDeclaration: size += variableDeclaration();
+    emit(INIT);
+    emit(ALLOC size);
+    emit(JMP label);
+
+    mainLabel = null;
+    for each variableDeclaration: mainLabel = variableDeclaration() if main function;
+
+    emit(label NOP);
+    emit(CALL mainLabel);
+    emit(ALLOC -size);
+    emit(HALT);
+}
+
+FunctionDeclaration => {
+    addToSymbolTable();
+    nestingLevel = incrementNestingLevel();
+    label = generateLabel();
+    emit(label PROC nestingLevel);
+    nestingLevel = decrementNestingLevel();
+    size = VariableDeclaration();
+    BlockStatement();
+    // What next? RET?
+}
+
+VariableDeclaration => {
+    add variableToSymbolTable();
+    return size;
+}
+
+Variable
+
+AssignmentStatement => {
+    if (isArray) {
+        loadLocationExpression();
+        evaluateExpression();
+        emit(STL)
+    } else if (isReference) {
+        evaluateExpression();
+        emit(ST arg1 arg2)
+    } else {
+        evaluateExpression();
+        emit(STI arg1 arg2);
+    }
+}
+
+WhileStatement => {
+    label = generateLabel();
+    label2 = generateLabel();
+    emit(label2 NOP);
+    evaluateExpression();
+    emit (JMPF label);
+    executeStatement();
+    emit(JMP label2);
+    emit(label NOP);
+}
+
+DoStatement => {
+    label = generateLabel();
+    emit(label NOP);
+    executeStatement();
+    evaluateExpression();
+    emit(JMPT label);
+}
+
+FunctionCallStatement => {
+    for each parameter:
+        if (isArray || isReference) {
+            loadLocationExpression();
+        } else {
+            evaluateExpression();
+        }
+
+    createNewTable();
+    emit(CALL functionLabel);
+    for each parameter: emit(pop)
+}
+
+IfStatement => {
+    evaluateExpression();
+    label = generateLabel();
+    emit(JMPF label)
+    executeStatement();
+    emit(label NOP);
+}
+
+BlockStatement => {
+    size = VariableDeclaration();
+    emit(ALLOC size);
+    for each statement: executeStatement();
+    emit(ALLOC -size);
+}
+
+BinaryExpression (<, >, =, !=, +, -, *, etc...) => {
+    evaluateExpression();
+    evaluateExpression();
+    emit(OP);
+}
+
+UnaryExpression (!, +, -) => {
+    // for + do nothing
+    evaluateExpression();
+    emit(OP)
+}
+
+
+/***** REDO THE LOCATION EXPRESSION STUFF
+loadLocationExpression() {
+    
+}
+
+// NEED TO CREATE a fetch and and an assign
+
+// fetch value from array
+LocationExpression => {
+    emit(LDA arg1 arg2)
+    evaluateExpression();
+    emit(ADD)
+    emit(IND)
+}
+
+// fetch value from variable
+LocationExpression => {
+    emit(LDV arg1 arg2)
+}
+
+// assign value to array *************
+LocationExpression => {
+    emit(LDA arg1 arg2)
+    evaluateExpression();
+    emit(ADD)
+}
+
+// assign value to variable
+LocationExpression => {
+    emit(ST arg1 arg2)
+}
+
+// load reference
+LocationExpression => {
+    emit(LDA arg1 arg2)
+}
+
+*****/
+
+NumberExpression => {
+    emit(LDC value)
+}
+
+BooleanExpression => {
+    emit(LDC value)
+}

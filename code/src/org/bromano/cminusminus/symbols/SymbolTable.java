@@ -1,29 +1,29 @@
-package org.bromano.cminusminus.checker;
+package org.bromano.cminusminus.symbols;
 
-import org.bromano.cminusminus.checker.primaries.Primary;
+import org.bromano.cminusminus.checker.CheckerException;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class Environment {
-    public Environment parent;
-    Map<String, Primary> variables;
+public class SymbolTable {
+    public SymbolTable parent;
+    Map<String, Symbol> variables;
 
-    public Environment() {
+    public SymbolTable() {
         this.variables = new HashMap<>();
     }
 
-    public void addVariable(String name, Primary primary) throws CheckerException {
+    public void addVariable(String name, Symbol symbol) throws CheckerException {
         if (this.variables.containsKey(name)) {
             throw new CheckerException(String.format("`%s` already exists in scope", name));
         }
 
-        this.variables.put(name, primary);
+        this.variables.put(name, symbol);
    }
 
     public boolean hasVariable(String name) {
 
-        Environment currEnviroment = this;
+        SymbolTable currEnviroment = this;
 
         while (currEnviroment != null) {
             if (currEnviroment.variables.containsKey(name)) {
@@ -36,9 +36,9 @@ public class Environment {
         return false;
     }
 
-    public Primary getVariable(String name) throws CheckerException {
+    public Symbol getVariable(String name) throws CheckerException {
 
-        Environment currEnviroment = this;
+        SymbolTable currEnviroment = this;
 
         while (currEnviroment != null) {
             if (currEnviroment.variables.containsKey(name)) {

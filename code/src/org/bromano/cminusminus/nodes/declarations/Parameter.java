@@ -6,5 +6,5 @@ public class Parameter {
     public Token type;
     public boolean isAddr;
     public Token name;
-    public Token number;
+    public boolean isArray;
 }
