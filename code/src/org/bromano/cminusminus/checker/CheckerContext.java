@@ -18,14 +18,14 @@ public class CheckerContext {
         symbolTable = new SymbolTable();
         FunctionType scanFunction = new FunctionType();
         FieldType scanFunctionParameter = new FieldType("value", new LiteralType(TypeKind.Number), true);
-        scanFunction.parameters.add(scanFunctionParameter);
+        scanFunction.fields.add(scanFunctionParameter);
         Symbol scanSymbol = new Symbol(scanFunction);
 
         symbolTable.addVariable("scan", scanSymbol);
 
         FunctionType printFunction = new FunctionType();
         FieldType printFunctionParameter = new FieldType("value", new LiteralType(TypeKind.Number), false);
-        printFunction.parameters.add(printFunctionParameter);
+        printFunction.fields.add(printFunctionParameter);
 
         Symbol printSymbol = new Symbol(printFunction);
 

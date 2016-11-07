@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FunctionType extends Type {
-    public List<FieldType> parameters;
+    public List<FieldType> fields;
 
     public FunctionType() {
         super(TypeKind.Function);
-        parameters = new ArrayList<>();
+        fields = new ArrayList<>();
     }
 
     @Override
@@ -19,12 +19,12 @@ public class FunctionType extends Type {
 
         FunctionType primaryType = (FunctionType) o;
 
-        if (primaryType.parameters.size() != this.parameters.size()) {
+        if (primaryType.fields.size() != this.fields.size()) {
             return false;
         }
 
-        for (int i = 0; i < this.parameters.size(); i++) {
-            if (!this.parameters.get(i).equals(primaryType.parameters.get(i))) {
+        for (int i = 0; i < this.fields.size(); i++) {
+            if (!this.fields.get(i).equals(primaryType.fields.get(i))) {
                 return false;
             }
         }

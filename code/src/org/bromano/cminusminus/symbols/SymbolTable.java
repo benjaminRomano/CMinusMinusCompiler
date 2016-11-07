@@ -23,14 +23,14 @@ public class SymbolTable {
 
     public boolean hasVariable(String name) {
 
-        SymbolTable currEnviroment = this;
+        SymbolTable currTable = this;
 
-        while (currEnviroment != null) {
-            if (currEnviroment.variables.containsKey(name)) {
+        while (currTable != null) {
+            if (currTable.variables.containsKey(name)) {
                 return true;
             }
 
-            currEnviroment = currEnviroment.parent;
+            currTable = currTable.parent;
         }
 
         return false;
@@ -38,14 +38,14 @@ public class SymbolTable {
 
     public Symbol getVariable(String name) throws CheckerException {
 
-        SymbolTable currEnviroment = this;
+        SymbolTable currTable = this;
 
-        while (currEnviroment != null) {
-            if (currEnviroment.variables.containsKey(name)) {
-                return currEnviroment.variables.get(name);
+        while (currTable != null) {
+            if (currTable.variables.containsKey(name)) {
+                return currTable.variables.get(name);
             }
 
-            currEnviroment = currEnviroment.parent;
+            currTable = currTable.parent;
         }
 
         throw new CheckerException(String.format("%s does not exist in scope", name));

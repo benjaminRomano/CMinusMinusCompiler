@@ -11,8 +11,10 @@ import org.bromano.cminusminus.types.*;
 
 public class Checker {
 
-    public void check(Program program) throws CheckerException {
+    public SymbolTable check(Program program) throws CheckerException {
         CheckerContext context = new CheckerContext();
+
+        program.symbolTable = context.symbolTable;
 
         for (Declaration declaration : program.declarations) {
             checkDeclaration(context, declaration);
@@ -30,9 +32,11 @@ public class Checker {
 
         FunctionType mainFunction = (FunctionType) symbol.getType();
 
-        if (mainFunction.parameters.size() != 0) {
-            throw new CheckerException("main must be have 0 parameters");
+        if (mainFunction.fields.size() != 0) {
+            throw new CheckerException("main must be have 0 fields");
         }
+
+        return context.symbolTable;
     }
 
     private void checkDeclaration(CheckerContext context, Declaration declaration) throws CheckerException {
@@ -69,6 +73,9 @@ public class Checker {
     private void checkFunctionDeclaration(CheckerContext context, FunctionDeclaration functionDeclaration) throws CheckerException {
         FunctionType functionType = new FunctionType();
 
+        SymbolTable newSymbolTable = new SymbolTable();
+        newSymbolTable.parent = context.symbolTable;
+
         for (Parameter parameter : functionDeclaration.parameters) {
             TypeKind typeKind = TypeKind.fromTokenKind(parameter.type.kind);
 
@@ -85,17 +92,25 @@ public class Checker {
                 type = new LiteralType(typeKind);
             }
 
-            functionType.parameters.add(new FieldType(parameter.name.value, type, parameter.isAddr));
+            newSymbolTable.addVariable(parameter.name.value, new Symbol(type, parameter.isAddr));
+            functionType.fields.add(new FieldType(parameter.name.value, type, parameter.isAddr));
         }
 
         context.symbolTable.addVariable(functionDeclaration.name.value, new Symbol(functionType, false));
-        checkBlockStatement(context, functionDeclaration.blockStatement);
+        context.symbolTable = newSymbolTable;
+        functionDeclaration.symbolTable = context.symbolTable;
+
+        checkBlockStatement(context, functionDeclaration.blockStatement, false);
     }
 
-    private void checkBlockStatement(CheckerContext context, BlockStatement blockStatement) throws CheckerException {
-        SymbolTable symbolTable = new SymbolTable();
-        symbolTable.parent = context.symbolTable;
-        context.symbolTable = symbolTable;
+    private void checkBlockStatement(CheckerContext context, BlockStatement blockStatement, boolean createNewTable) throws CheckerException {
+        if (createNewTable) {
+            SymbolTable symbolTable = new SymbolTable();
+            symbolTable.parent = context.symbolTable;
+            context.symbolTable = symbolTable;
+        }
+
+        blockStatement.symbolTable = context.symbolTable;
 
         for (VariableDeclaration variableDeclaration : blockStatement.variableDeclarations) {
             checkVariableDeclaration(context, variableDeclaration);
@@ -112,7 +127,7 @@ public class Checker {
 
     private void checkStatement(CheckerContext context, Statement statement) throws CheckerException {
         if (statement instanceof BlockStatement) {
-            checkBlockStatement(context, (BlockStatement) statement);
+            checkBlockStatement(context, (BlockStatement) statement, true);
         } else if (statement instanceof IfStatement) {
             checkIfStatement(context, (IfStatement) statement);
         } else if (statement instanceof WhileStatement) {
@@ -139,20 +154,20 @@ public class Checker {
 
         FunctionType functionPrimary = (FunctionType) symbol.getType();
 
-        if (functionPrimary.parameters.size() != functionCallStatement.arguments.size()) {
-            throw new CheckerException(String.format("Argument mismatch. Expected %d arguments, received %d", functionPrimary.parameters.size(), functionCallStatement.arguments.size()), functionCallStatement.name.linePos);
+        if (functionPrimary.fields.size() != functionCallStatement.arguments.size()) {
+            throw new CheckerException(String.format("Argument mismatch. Expected %d arguments, received %d", functionPrimary.fields.size(), functionCallStatement.arguments.size()), functionCallStatement.name.linePos);
 
         }
 
         for (int i = 0; i < functionCallStatement.arguments.size(); i++) {
             Type type = checkExpression(context, functionCallStatement.arguments.get(i));
 
-            if (functionPrimary.parameters.get(i).isReference() && !(functionCallStatement.arguments.get(i) instanceof LocationExpression)) {
+            if (functionPrimary.fields.get(i).isReference() && !(functionCallStatement.arguments.get(i) instanceof LocationExpression)) {
                 throw new CheckerException("Expected locationExpression for pass-by-reference parameter",  functionCallStatement.name.linePos);
             }
 
-            if (!(type.equals(functionPrimary.parameters.get(i).getType()))) {
-                throw new CheckerException("Expected parameter of type, " + functionPrimary.parameters.get(i).getTypeKind() + ", but given type " + symbol.getType(), functionCallStatement.name.linePos);
+            if (!(type.equals(functionPrimary.fields.get(i).getType()))) {
+                throw new CheckerException("Expected parameter of type, " + functionPrimary.fields.get(i).getTypeKind() + ", but given type " + symbol.getType(), functionCallStatement.name.linePos);
             }
         }
    }
@@ -162,7 +177,9 @@ public class Checker {
 
         Type value = checkExpression(context, assignmentStatement.expression);
 
-        if (!location.equals(value)) {
+        if (location.getTypeKind() == TypeKind.Array) {
+            throw new CheckerException("Cannot assign value to an array type", assignmentStatement.locationExpression.name.linePos);
+        } else if (!location.equals(value)) {
             throw new CheckerException("TypeKind mismatch on assignment. Given " + value.getTypeKind() + ", expected " + location.getTypeKind(), assignmentStatement.locationExpression.name.linePos);
         }
     }

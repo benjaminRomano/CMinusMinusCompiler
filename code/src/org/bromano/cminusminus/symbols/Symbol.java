@@ -4,8 +4,8 @@ import org.bromano.cminusminus.types.Type;
 import org.bromano.cminusminus.types.TypeKind;
 
 public class Symbol {
-
     public String label;
+    public Location location;
 
     private Type type;
     private boolean reference;

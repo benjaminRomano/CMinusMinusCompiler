@@ -156,3 +156,22 @@ NumberExpression => {
 BooleanExpression => {
     emit(LDC value)
 }
+
+
+
+
+
+
+
+function insert(int&b) {
+  b = a;
+}
+
+function update(int& a) {
+    insert(a);
+}
+
+function main() {
+  int c = 5;
+  update(c);
+}
