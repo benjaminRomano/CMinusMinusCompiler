@@ -167,7 +167,7 @@ public class Checker {
             }
 
             if (!(type.equals(functionPrimary.fields.get(i).getType()))) {
-                throw new CheckerException("Expected parameter of type, " + functionPrimary.fields.get(i).getTypeKind() + ", but given type " + symbol.getType(), functionCallStatement.name.linePos);
+                throw new CheckerException("Expected parameter of type, " + functionPrimary.fields.get(i).getTypeKind() + ", but given type " + type.getTypeKind(), functionCallStatement.name.linePos);
             }
         }
    }
@@ -212,7 +212,9 @@ public class Checker {
         }
 
         checkStatement(context, ifStatement.statement);
-        checkStatement(context, ifStatement.elseStatement);
+        if (ifStatement.elseStatement != null) {
+            checkStatement(context, ifStatement.elseStatement);
+        }
     }
 
     private Type checkExpression(CheckerContext context, Expression expression) throws CheckerException {
@@ -266,7 +268,7 @@ public class Checker {
         Type rightExpression = checkExpression(context, binaryExpression.right);
 
         if (isAMatch(new TokenKind[] { TokenKind.ExclamationEquals, TokenKind.EqualsEquals }, kind)) {
-            if (leftExpression.equals(rightExpression)) {
+            if (!leftExpression.equals(rightExpression)) {
                 throw new CheckerException("TypeKind mismatch for, " + binaryExpression.operator.value + " operator", binaryExpression.operator.linePos);
             }
 

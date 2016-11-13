@@ -65,7 +65,7 @@ public class Generator {
         }
 
         emit(new Instruction(label, OpCode.NOP));
-        emit(new Instruction(symbolTable.getVariable("main").label, OpCode.CALL));
+        emit(new Instruction(OpCode.CALL, symbolTable.getVariable("main").label));
 
         if (size != 0) {
             emit(new Instruction(OpCode.ALLOC, -size));
@@ -106,10 +106,10 @@ public class Generator {
         Symbol symbol = this.symbolTable.getVariable(functionDeclaration.name.value);
         FunctionType functionType = (FunctionType) symbol.getType();
 
-        // -2 because after arguments is the return address and then the link data
+        // functionType.fields.size() - 1 because after arguments is the return address and then the link data
         for (int i = 0; i < functionType.fields.size(); i++) {
             Symbol argumentSymbol = symbolTable.getVariable(functionType.fields.get(i).getName());
-            argumentSymbol.location  = new Location(this.level, i - 2);
+            argumentSymbol.location  = new Location(this.level, i - 1 - functionType.fields.size());
         }
 
         String label = generateLabel();
@@ -206,7 +206,7 @@ public class Generator {
             if (symbol.isReference()) {
                 emit(new Instruction(OpCode.LDV, symbol.location));
             } else {
-                emit(new Instruction(OpCode.LDV, symbol.location));
+                emit(new Instruction(OpCode.LDA, symbol.location));
             }
 
             generateExpression(assignmentStatement.locationExpression.expression);
@@ -272,6 +272,11 @@ public class Generator {
         }
 
         emit(new Instruction(OpCode.CALL, symbol.label));
+
+        for (int i = 0; i < functionType.fields.size(); i++) {
+            emit(new Instruction(OpCode.POP));
+        }
+
     }
 
     private void generateIfStatement(IfStatement ifStatement) throws GeneratorException, CheckerException {
@@ -287,6 +292,7 @@ public class Generator {
             String endLabel = generateLabel();
             emit(new Instruction(OpCode.JMPF, elseLabel));
             generateStatement(ifStatement.statement);
+            emit(new Instruction(OpCode.JMP, endLabel));
             emit(new Instruction(elseLabel, OpCode.NOP));
             generateStatement(ifStatement.elseStatement);
             emit(new Instruction(endLabel, OpCode.NOP));
@@ -304,7 +310,7 @@ public class Generator {
             emit(new Instruction(null, OpCode.LDC, ((NumberExpression) expression).value.value, null));
         } else {
             BooleanExpression booleanExpression = (BooleanExpression)  expression;
-            if (booleanExpression.value.value.toLowerCase().equals("true")) {
+            if (booleanExpression.value.kind == TokenKind.TrueKeyword) {
                 emit(new Instruction(OpCode.LDC, "1"));
             } else {
                 emit(new Instruction(OpCode.LDC, "0"));

@@ -192,6 +192,7 @@ public class CMinusMinusParser implements Parser {
                 this.match(TokenKind.OpenBracket);
                 this.match(TokenKind.CloseBracket);
                 parameter.isArray = true;
+                parameter.isAddr = true; // array parameters are references
             }
         }
 

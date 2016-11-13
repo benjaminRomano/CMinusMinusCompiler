@@ -1,18 +1,32 @@
-/* Compute square root of N using bisection algorithm. */
 
-int N, low, high;
-
-void update( )
-{ int mid;
-  mid=(low+high)/2;
-  if (mid*mid<=N) low=mid; else high=mid;
+/*   this program
+     illustrates evaluation of 
+     arithmetic and boolean
+     expressions
+*/
+void main()
+{
+  int m, n, p;
+  bool a, b, c;
+  scan(m);
+  print(m);
+  scan(n);
+  print(n);
+  p = -m - 3 + n / 2 * (-5 + m * n % 4);
+  print(p);
+  a = m > n || n >= p;
+  if (a)
+    print(1);
+  else
+    print(0);
+  b = m < n && n <= p;
+  if (b == true)
+    print(1);
+  else
+    print(0);
+  c = a && !b || !a && b;
+  if (c != false)
+    print(1);
+  else
+    print(0);
 }
-
-void main( )
-{ scan(N);
-  low=0;
-  high=N+1;
-  while (high-low>1) update( );
-  print(low);
-}
-

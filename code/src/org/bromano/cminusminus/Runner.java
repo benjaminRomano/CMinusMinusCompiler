@@ -7,7 +7,6 @@ import org.bromano.cminusminus.lexer.CMinusMinusLexer;
 import org.bromano.cminusminus.lexer.Token;
 import org.bromano.cminusminus.nodes.Program;
 import org.bromano.cminusminus.parser.CMinusMinusParser;
-import org.bromano.cminusminus.symbols.SymbolTable;
 
 import java.io.*;
 import java.util.List;
@@ -17,6 +16,7 @@ public class Runner {
     public static void main(String[] args) throws Exception {
         if (args.length >= 1) {
             run(loadFile(args[0]));
+            return;
         }
 
         run(readFromSystemIn());
@@ -57,12 +57,14 @@ public class Runner {
         List<Token> tokens = new CMinusMinusLexer(code).getLexStream();
         tokens.forEach(System.out::println);
         Program program = new CMinusMinusParser(tokens).parse();
-        SymbolTable symbolTable = new Checker().check(program);
+        new Checker().check(program);
         List<Instruction> instructions = new Generator().generate(program);
 
         System.out.println();
         instructions.forEach(System.out::println);
 
-        System.out.println("Parsed and checked code Successfully!");
+        try (PrintWriter out = new PrintWriter("output.sm")) {
+            instructions.forEach(out::println);
+        }
     }
 }

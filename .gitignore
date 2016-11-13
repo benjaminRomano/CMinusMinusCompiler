@@ -13,3 +13,7 @@ hs_err_pid*
 
 .idea/
 out/
+output/
+.vscode/
+a.out
+output.sm

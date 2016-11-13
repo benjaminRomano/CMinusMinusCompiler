@@ -1,0 +1,36 @@
+Program -> ( VariableDeclaration | FunctionDeclaration )*
+VariableDeclaration -> Type VariableList semic
+Type -> int | bool
+VariableList -> Variable ( comma Variable )*
+Variable -> identifier ( lbrack number rbrack | . )
+FunctionDeclaration -> void identifier lparen ParameterList rparen Block
+ParameterList -> Parameter ( comma Parameter )* | .
+Parameter -> Type identifier ( lbrack rbrack | . ) | Type addr identifier
+Block -> lcurly VariableDeclaration* Statement* rcurly
+Statement -> Block | IfStatement | WhileStatement | DoStatement | Assignment | FunctionCall
+IfStatement -> if lparen Expression rparen Statement ( else Statement | . )
+WhileStatement -> while lparen Expression rparen Statement
+DoStatement -> do Statement while lparen Expression rparen semic
+Assignment -> Location is Expression semic
+FunctionCall -> identifier lparen ExpressionList rparen semic
+ExpressionList -> Expression ( comma Expression )* | .
+Expression -> Conjunction ( or Conjunction )*
+Conjunction -> Equality ( and Equality )*
+Equality -> Inequality | Inequality ( eq | ne ) Inequality
+Inequality -> Sum | Sum ( lt | gt | le | ge ) Sum
+Sum -> Product ( plus Product | minus Product )*
+Product -> Factor ( times Factor | div Factor | mod Factor )*
+Factor -> ( plus | minus | not | . ) Primary
+Primary -> Location | number | true | false | lparen Expression rparen
+Location -> identifier ( lbrack Expression rbrack | . )
+
+
+Program -> VariableDeclaration Program | FunctionDeclaration Program | .
+VariableDeclaration -> Type VariableList semic.
+Type -> int | bool.
+VariableList -> Variable | Variable comma VariableList.
+Variable -> identifier lbrack number rback | identifier.
+FunctionDeclaration -> void identifier lparen ParameterList rparen Block | void identifier lparen rparen { Block }.
+ParameterList -> Parameter | Parameter comma ParameterList.
+Parameter -> Type identifier lbrack rbrack | Type addr identifier | Type identifier.
+Block -> VariableDeclaration
