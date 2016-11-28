@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="code" default="all">
+  
+  
+  <property file="build.properties"/>
+  <!-- Uncomment the following property if no tests compilation is needed -->
+  <!-- 
+  <property name="skip.tests" value="true"/>
+   -->
+  
+  <!-- Compiler options -->
+  
+  <property name="compiler.debug" value="on"/>
+  <property name="compiler.generate.no.warnings" value="off"/>
+  <property name="compiler.args" value=""/>
+  <property name="compiler.max.memory" value="700m"/>
+  <patternset id="ignored.files">
+    <exclude name="**/*.hprof/**"/>
+    <exclude name="**/*.pyc/**"/>
+    <exclude name="**/*.pyo/**"/>
+    <exclude name="**/*.rbc/**"/>
+    <exclude name="**/*.yarb/**"/>
+    <exclude name="**/*~/**"/>
+    <exclude name="**/.DS_Store/**"/>
+    <exclude name="**/.git/**"/>
+    <exclude name="**/.hg/**"/>
+    <exclude name="**/.svn/**"/>
+    <exclude name="**/CVS/**"/>
+    <exclude name="**/__pycache__/**"/>
+    <exclude name="**/_svn/**"/>
+    <exclude name="**/vssver.scc/**"/>
+    <exclude name="**/vssver2.scc/**"/>
+  </patternset>
+  <patternset id="library.patterns">
+    <include name="*.war"/>
+    <include name="*.swc"/>
+    <include name="*.zip"/>
+    <include name="*.ear"/>
+    <include name="*.egg"/>
+    <include name="*.ane"/>
+    <include name="*.jar"/>
+  </patternset>
+  <patternset id="compiler.resources">
+    <exclude name="**/?*.java"/>
+    <exclude name="**/?*.form"/>
+    <exclude name="**/?*.class"/>
+    <exclude name="**/?*.groovy"/>
+    <exclude name="**/?*.scala"/>
+    <exclude name="**/?*.flex"/>
+    <exclude name="**/?*.kt"/>
+    <exclude name="**/?*.clj"/>
+    <exclude name="**/?*.aj"/>
+  </patternset>
+  
+  <!-- Modules -->
+  
+  
+  <!-- Module code -->
+  
+  <dirname property="module.code.basedir" file="${ant.file}"/>
+  
+  
+  
+  <property name="compiler.args.code" value="-encoding UTF-8 -source 8 -target 8 ${compiler.args}"/>
+  
+  <property name="code.output.dir" value="${module.code.basedir}/../output/production/code"/>
+  <property name="code.testoutput.dir" value="${module.code.basedir}/../output/test/code"/>
+  
+  <path id="code.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="code.module.production.classpath"/>
+  
+  <path id="code.runtime.production.module.classpath">
+    <pathelement location="${code.output.dir}"/>
+  </path>
+  
+  <path id="code.module.classpath">
+    <pathelement location="${code.output.dir}"/>
+  </path>
+  
+  <path id="code.runtime.module.classpath">
+    <pathelement location="${code.testoutput.dir}"/>
+    <pathelement location="${code.output.dir}"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.code">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.code">
+    <patternset refid="excluded.from.module.code"/>
+  </patternset>
+  
+  <path id="code.module.sourcepath">
+    <dirset dir="${module.code.basedir}">
+      <include name="src"/>
+    </dirset>
+  </path>
+  
+  
+  <target name="compile.module.code" depends="compile.module.code.production,compile.module.code.tests" description="Compile module code"/>
+  
+  <target name="compile.module.code.production" description="Compile module code; production classes">
+    <mkdir dir="${code.output.dir}"/>
+    <javac destdir="${code.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true">
+      <compilerarg line="${compiler.args.code}"/>
+      <bootclasspath refid="code.module.bootclasspath"/>
+      <classpath refid="code.module.production.classpath"/>
+      <src refid="code.module.sourcepath"/>
+      <patternset refid="excluded.from.compilation.code"/>
+    </javac>
+    
+    <copy todir="${code.output.dir}">
+      <fileset dir="${module.code.basedir}/src">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="compile.module.code.tests" depends="compile.module.code.production" description="compile module code; test classes" unless="skip.tests"/>
+  
+  <target name="clean.module.code" description="cleanup module">
+    <delete dir="${code.output.dir}"/>
+    <delete dir="${code.testoutput.dir}"/>
+  </target>
+  
+  <target name="init" description="Build initialization">
+    <!-- Perform any build initialization in this target -->
+  </target>
+  
+  <target name="clean" depends="clean.module.code" description="cleanup all"/>
+  
+  <target name="build.modules" depends="init, clean, compile.module.code" description="build all modules"/>
+  
+  <target name="init.artifacts">
+    <property name="artifacts.temp.dir" value="${basedir}/__artifacts_temp"/>
+    <property name="artifact.output.cminusminuscompiler" value="${basedir}/../dist"/>
+    <mkdir dir="${artifacts.temp.dir}"/>
+    <property name="temp.jar.path.CMinusMinusCompiler.jar" value="${artifacts.temp.dir}/CMinusMinusCompiler.jar"/>
+  </target>
+  
+  <target name="artifact.cminusminuscompiler" depends="init.artifacts, compile.module.code" description="Build &#39;CMinusMinusCompiler&#39; artifact">
+    <property name="artifact.temp.output.cminusminuscompiler" value="${artifacts.temp.dir}/CMinusMinusCompiler"/>
+    <mkdir dir="${artifact.temp.output.cminusminuscompiler}"/>
+    <jar destfile="${temp.jar.path.CMinusMinusCompiler.jar}" duplicate="preserve" filesetmanifest="mergewithoutmain">
+      <manifest>
+        <attribute name="Main-Class" value="org.bromano.cminusminus.Runner"/>
+      </manifest>
+      <zipfileset dir="${code.output.dir}"/>
+    </jar>
+    <copy file="${temp.jar.path.CMinusMinusCompiler.jar}" tofile="${artifact.temp.output.cminusminuscompiler}/CMinusMinusCompiler.jar"/>
+  </target>
+  
+  <target name="build.all.artifacts" depends="artifact.cminusminuscompiler" description="Build all artifacts">
+    <mkdir dir="${artifact.output.cminusminuscompiler}"/>
+    <copy todir="${artifact.output.cminusminuscompiler}">
+      <fileset dir="${artifact.temp.output.cminusminuscompiler}"/>
+    </copy>
+    
+    <!-- Delete temporary files -->
+    <delete dir="${artifacts.temp.dir}"/>
+  </target>
+  
+  <target name="all" depends="build.modules, build.all.artifacts" description="build all"/>
+</project>

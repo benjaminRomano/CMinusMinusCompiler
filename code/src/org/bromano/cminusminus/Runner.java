@@ -55,13 +55,13 @@ public class Runner {
 
     public static void run(String code) throws Exception {
         List<Token> tokens = new CMinusMinusLexer(code).getLexStream();
-        tokens.forEach(System.out::println);
+//        tokens.forEach(System.out::println);
         Program program = new CMinusMinusParser(tokens).parse();
         new Checker().check(program);
         List<Instruction> instructions = new Generator().generate(program);
 
-        System.out.println();
-        instructions.forEach(System.out::println);
+//        System.out.println();
+//        instructions.forEach(System.out::println);
 
         try (PrintWriter out = new PrintWriter("output.sm")) {
             instructions.forEach(out::println);
