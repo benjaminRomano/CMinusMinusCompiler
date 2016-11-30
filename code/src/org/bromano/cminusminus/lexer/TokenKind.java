@@ -22,7 +22,6 @@ public enum TokenKind {
     OpenBracket,
     CloseBracket,
     Equals,
-    EqualsGreaterThan,
     LessThan,
     LessThanEquals,
     GreaterThan,

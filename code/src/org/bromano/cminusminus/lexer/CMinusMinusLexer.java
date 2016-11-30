@@ -160,9 +160,6 @@ public class CMinusMinusLexer implements Lexer {
                     if (isAMatch(this.pos, "=")) {
                         this.pos++;
                         return new Token(TokenKind.EqualsEquals, "==", linePos);
-                    } else if (this.isAMatch(this.pos, ">")) {
-                        this.pos++;
-                        return new Token(TokenKind.EqualsGreaterThan, "=>", linePos);
                     }
 
                     return new Token(TokenKind.Equals, "=", linePos);
